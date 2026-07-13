@@ -1,0 +1,243 @@
+<!--
+  Consolidated benefits dashboard - all 3 cards merged, day-first, category-grouped.
+  Cards: Santander WorldMember Limited (Mastercard) | Scotiabank Singular Visa Infinite | Bice Visa Infinite
+  Data extracted live (July 2026) from each bank's official feed. Bank shown via colored dot + left border.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap');
+  :root{--bg:#0e0f12;--panel:#16181d;--panel-2:#1c1f26;--hair:#2a2e37;--gold:#c9a96a;--gold-dim:#8a7748;--ember:#d9573f;--ink:#f3f0e9;--ink-2:#a2a7b0;--ink-3:#6d7079;
+    --san:#e5484d;--sco:#f0883e;--bice:#5b8bd0;--mds:#7fa6c9}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink)}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;padding:22px 16px 48px}
+  .wrap{max-width:820px;margin:0 auto}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:34px;line-height:1.03;letter-spacing:-.01em;margin:10px 0 6px}
+  h1 em{font-style:italic;color:var(--gold)}
+  .sub{color:var(--ink-2);font-size:13.5px;max-width:66ch}
+  .stamp{margin-top:10px;font-size:11px;color:var(--gold-dim);letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:16px 0 4px;padding:12px 14px;background:var(--panel);border:1px solid var(--hair);border-radius:5px}
+  .lg{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2)}
+  .lg .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .lg b{color:var(--ink);font-weight:600}
+  .lg .cc{color:var(--ink-3)}
+  .dot.san{background:var(--san)}.dot.sco{background:var(--sco)}.dot.bice{background:var(--bice)}
+  .rule{height:1px;background:var(--hair);margin:16px 0}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .seg{display:inline-flex;border:1px solid var(--hair);border-radius:3px;overflow:hidden}
+  .seg button{appearance:none;background:transparent;border:0;border-right:1px solid var(--hair);color:var(--ink-2);font-family:inherit;font-size:12px;font-weight:600;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:var(--panel-2);color:var(--gold)}
+  .seg .d{width:8px;height:8px;border-radius:50%}
+  .search{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--hair);border-radius:3px;color:var(--ink);font-family:inherit;font-size:13px;padding:8px 11px}
+  .search::placeholder{color:var(--ink-3)}
+  .ribbon{display:flex;flex-wrap:wrap;gap:6px}
+  .day{position:relative;flex:1 1 0;min-width:40px;background:var(--panel);border:1px solid var(--hair);border-radius:3px;padding:9px 4px 7px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .day.everyday{flex:1 1 92px;min-width:92px;border-color:var(--gold-dim)}
+  .day.everyday .dl{color:var(--gold)}
+  .day:hover{border-color:var(--gold-dim)}
+  .day .dl{font-size:12px;font-weight:600;letter-spacing:.05em;color:var(--ink-2)}
+  .day .cnt{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--ink-3);margin-top:2px}
+  .day.sel{background:var(--panel-2);border-color:var(--gold)}
+  .day.sel .dl,.day.sel .cnt{color:var(--gold)}
+  .day.today::after{content:"";position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--ember);box-shadow:0 0 0 3px rgba(217,87,63,.18)}
+  .dayhead{display:flex;align-items:baseline;justify-content:space-between;margin:16px 0 6px}
+  .dayhead h2{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:23px;margin:0}
+  .dayhead h2 span{color:var(--ink-3);font-size:13px;font-style:italic;font-weight:400}
+  .dayhead .hoy{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ember);font-weight:600}
+  .catlbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);font-weight:600;margin:16px 0 9px;display:flex;align-items:center;gap:9px}
+  .catlbl .n{color:var(--ink-3);font-weight:500;letter-spacing:.02em}
+  .catlbl::after{content:"";flex:1;height:1px;background:var(--hair)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .m{background:var(--panel);border:1px solid var(--hair);border-left-width:3px;border-radius:4px;padding:10px 13px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .m.san{border-left-color:var(--san)}.m.sco{border-left-color:var(--sco)}.m.bice{border-left-color:var(--bice)}
+  .m .mn{font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.22;display:flex;align-items:center;gap:7px}
+  .m .mn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .m .ml{font-size:11.5px;color:var(--ink-3);margin-top:3px;display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+  .m .ml .rate{color:var(--gold);font-weight:600}
+  .m .ml .rate em{color:var(--ink-3);font-style:normal;font-weight:400}
+  .m .ml .price{color:#6fae7a;font-weight:600;font-family:ui-monospace,Menlo,monospace}
+  .m .ml .sep{color:var(--hair)}
+  .m .minfo{min-width:0}
+  .m .ml .site{color:var(--sco);font-weight:600;text-decoration:none;white-space:nowrap}
+  .m .ml .site:hover{text-decoration:underline}
+  .tag.e{color:#6fae7a;border-color:#2f5138}
+  .m .note{font-size:10.5px;color:var(--ink-3);margin-top:6px;line-height:1.45;border-top:1px dashed var(--hair);padding-top:5px}
+  .m .fl{margin-top:5px;display:flex;flex-wrap:wrap;gap:4px}
+  .tag{font-size:9px;letter-spacing:.03em;text-transform:uppercase;font-weight:600;padding:2px 6px;border-radius:2px;border:1px solid var(--hair);color:var(--ink-3)}
+  .tag.w{color:var(--gold);border-color:var(--gold-dim)}
+  .tag.m{color:var(--mds);border-color:#3a5064}
+  .m .disc{font-family:'Fraunces',Georgia,serif;font-weight:700;font-size:18px;color:var(--gold);white-space:nowrap;line-height:1}
+  .m .disc.small{font-size:10px;font-family:'Inter';font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+  .empty{color:var(--ink-3);font-size:12.5px;padding:4px 2px}
+  .foot{margin-top:24px;font-size:11px;color:var(--ink-3);line-height:1.6}
+  .foot a{color:var(--gold-dim)}
+  @media(max-width:560px){h1{font-size:27px}.grid{grid-template-columns:1fr}.m .disc{font-size:16px}}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Consolidated benefits</div>
+  <h1>Every card, <em>by day</em></h1>
+  <p class="sub">All restaurant, wine and food benefits from your three cards in one view. Pick a day &mdash; you'll see that day's deals plus the always-on ones &mdash; scan Food / Wine / Other, tap through to each venue, and check the notes for the terms that apply.</p>
+
+  <div class="stamp" id="stamp"></div>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="controls">
+    <div class="seg" id="catseg"></div>
+    <div class="seg" id="bankseg"></div>
+    <div class="seg" id="sortseg"></div>
+    <input class="search" id="q" placeholder="Search venue...">
+  </div>
+
+  <div class="ribbon" id="ribbon"></div>
+
+  <div class="dayhead"><h2 id="dayTitle"></h2><span class="hoy" id="hoyTag"></span></div>
+  <div id="dayBody"></div>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const UPDATED="July 2026";
+const DAYS=[{k:"lun",l:"MON",f:"Monday"},{k:"mar",l:"TUE",f:"Tuesday"},{k:"mie",l:"WED",f:"Wednesday"},{k:"jue",l:"THU",f:"Thursday"},{k:"vie",l:"FRI",f:"Friday"},{k:"sab",l:"SAT",f:"Saturday"},{k:"dom",l:"SUN",f:"Sunday"}];
+const CATS=[{k:"food",l:"Food"},{k:"wine",l:"Wine"},{k:"other",l:"Other"}];
+const BANKMETA={san:{name:"Santander",card:"WorldMember Limited (Mastercard) - 40%"},sco:{name:"Scotiabank",card:"Singular Visa Infinite"},bice:{name:"Banco Bice",card:"Visa Infinite"}};
+
+/* SANTANDER [name, daysCSV, region, flags] */
+const SAN=[["Naoki","lun","RM","A"],["Brunapoli","diario","RM","WM"],["Demencia","mie","RM","W"],["Hijo del Sol","mie","RM","M"],["Hijo del Inca","mie","RM","M"],["Dulceria Puerto Varas","mie","RM",""],["De Pura Madre","vie","RM",""],["Vicenzo Cucina","jue","",""],["Al Pesto","mar","","M"],["Sushi Nikkei 17","lun","RM","M"],["Pettra","diario","","W"],["La Maestranza","sab","RM",""],["Lumiere Bistro","diario","",""],["Don Teo","mie","R","M"],["Bar Nomade","mie","","M"],["Majestic","dom","RM",""],["Madonna","mie","R","M"],["Carnivo Steakhouse","mie","",""],["Jardin Mallinkrodt","diario","RM",""],["Dominga Bistro","mie","R","M"],["Casa Vitalis","sab","RM",""],["Kiara","jue","RM","W"],["Oh Bok","vie","RM",""],["Zulu","dom","RM",""],["Club Somos","mie","R","M"],["La Yunta","diario","RM",""],["Quercus","mar","RM","M"],["Maillard","jue","RM","W"],["Tropicalia","sab","RM",""],["PF Chang's","mie","RM","M"],["Pristino","vie","RM","W"],["Nikkei 419","mie","R","M"],["Majka","jue","",""],["Restaurante Hotel AWA","jue","R","M"],["Vertigo","mie","RM",""],["Local Burger","mie","",""],["Vapiano","mar,jue","RM",""],["eCook","mar,jue","RM",""],["Fork","vie","RM",""],["Sakura","vie","RM",""],["Le Vice Chocolat","jue","RM",""],["Burger King","jue","RMR",""],["Chicken Love You","mie","RMR","M"],["Streat Burger","mie","RMR","M"],["Bozzo","mar","R",""],["Domino","mar","RMR",""],["Melt Pizzas","mar","RMR",""],["El Taller","mar","RM",""],["CuracaRibs","lun","RM",""],["Work/Cafe","lun,mar,mie,jue,vie","RMR",""],["Cascade Bistro","vie","RM",""],["Corrales del Sur","lun","",""],["El Mundo del Vino","lun","RM","W"],["Rocoto","mie","","M"],["Curry","mie","RM","M"],["Madre Pizza","mie","RM","M"],["Kento Sushi","mie","RM","M"],["Bar Porfirio","mie","RM","M"],["Delivery Gourmet","mie","RM","M"],["Expendio Montt","mie","RM","M"],["Social Bar","lun","RM",""],["Cosecha del Mar","vie","RMR","W"],["Corrales del Sur","jue","RMR","W"],["Juan Esparraguito","mie","RM","W"],["Aquality","mar","RM","W"],["Pescados Capitales","mie","RM","A"],["Cosenza","mie","RM","A"],["99 Restaurante","jue","RM","A"],["Vinolia","vie","RM","A"],["Raidho","vie","RMR","W"],["La Dicha","jue","RM","W"],["La Burguesia","lun","RM",""]];
+/* SCOTIABANK [name, day, discNum, loc, subcat] */
+const SCO=[["MIT Burger - Casacostanera","jue","50","Vitacura","Local"],["DO Sushi","jue","50","Providencia","Local"],["Don Carlos","jue","50","Las Condes","Local"],["La Parrilla del Guaton Jerez","jue","50","Vitacura","Local"],["Kato","jue","50","Las Condes","Local"],["Catae Restaurante","diario","20","Vitacura","Local"],["Shinsei Nikkei Cuisine","diario","20","Vitacura","Local"],["Kechua - Nunoa","diario","20","Nunoa","Local"],["Kechua - Borde Rio","diario","20","Vitacura","Local"],["Kechua - Terrazas San Cristobal","diario","20","Providencia","Local"],["Giulietta (from 19h)","lun","20","La Florida","Local"],["Umami Bar Nikkei","jue","50","Valdivia","Local"],["Gusto Restobar","jue","50","Concepcion","Local"],["Kanpai","jue","50","Pichilemu","Local"],["San Marco","jue","50","Vina del Mar","Local"],["La Hacienda","jue","50","Talca","Local"],["Novu - Curico","jue","50","Curico","Local"],["Novu - Santa Cruz","jue","50","Santa Cruz","Local"],["Boreal Bar","jue","50","Rancagua","Local"],["Regal Pacific","diario","20","Buenos Aires","Internacional"],["Punto Mona","diario","20","Buenos Aires","Internacional"],["Basa Bar","diario","15","Buenos Aires","Internacional"],["Gran Bar Danzon","diario","15","Buenos Aires","Internacional"],["Oh No Lulu Bar","diario","15","Buenos Aires","Internacional"],["VIK Wine","diario","","Millahue","Vinas"],["Santa Rita","mar","","Alto Jahuel","Vinas"],["Vina Encierra","mie","","","Vinas"],["Vina Undurraga","jue","","Talagante","Vinas"],["Viu Manent","vie","","Colchagua","Vinas"],["Vina Terra Noble","sab","","Maule","Vinas"],["Calyptra","dom","","Cachapoal","Vinas"],["Lo Saldes","lun","","","Dulce"],["Dulce Barquillo","mar","","","Dulce"],["Oakberry","mie","","","Dulce"],["Dulceria Frutillar","jue","","","Dulce"],["Castano","vie","","","Dulce"],["Tavelli","sab","","","Dulce"],["Entrelagos","dom","","","Dulce"],["Sushi Ryge","lun","","","Rapida"],["Noah Sushi","mar","","","Rapida"],["Just Burger","mie","","","Rapida"],["Chicken Factory","mie","","","Rapida"],["Street Wrap","jue","","","Rapida"],["Kento Sushi","vie","","","Rapida"]];
+/* BICE [name, daysCSV, disc, loc, cat] */
+const BICE=[["Cambalache","mie","40%","Puerto Varas","R"],["La Isla Cochoa","jue","40%","Vina del Mar","R"],["A Las Rocas","diario","20%","Online","G"],["ZIA Cafe Bistro","diario","20%","Lo Barnechea","R"],["El Galpon","jue","40%","Osorno","R"],["Las Tranqueras","jue","40%","Temuco","R"],["Oporto Salvaje","vie","40%","Las Condes","R"],["Romaria Pizzeria","lun","40%","Vitacura","R"],["La Santoria","mie,dom","40%","Providencia","R"],["Vinopolis","diario","20%","Online","G"],["Living Cafe","vie","40%","Las Condes","R"],["The Elephant Coffee","sab","40%","Las Condes","R"],["Le Grenier","jue","40%","Vina del Mar","R"],["AM Dulceria","jue","40%","Online/Presencial","G"],["Pasteleria Tere Young","jue","40%","Presencial","G"],["La Dulceria Apoquindo","vie","40%","Presencial","G"],["Batard","mar","40%","Las Condes","R"],["Cafe Lo Matta","dom","40%","Vitacura","R"],["Liquidos","sab","","Tienda fisica","G"],["Caoba Bar","mar","40%","Vitacura","R"],["Adelina Pasteleria","lun","40%","Vitacura","G"],["Barbazul","jue","40%","Las Condes / Vitacura","R"],["Dulces Issa","mar","40%","Online/Presencial","G"],["Dulceria Frutillar","mie","40%","Presencial","G"],["Gusto Restobar","mie","40%","Concepcion","R"],["PedidosYa","diario","30%","Online","D"],["Rappi","diario","30%","Online","D"],["Rappi (Mon/Wed/Fri/Sun)","lun,mie,vie,dom","30%","Online","D"],["La Punta - Justo","vie","50%","Metropolitana","D"],["Sushi Ryge - Justo","vie","50%","Metropolitana","D"],["Kobo - Justo","vie","50%","Metropolitana","D"],["Street Wrap - Justo","vie","50%","Metropolitana","D"],["Hotel Jose Nogueira","jue","40%","Punta Arenas","R"],["La Pasta de la Nonna","mie","40%","Concepcion","R"],["Kevin and Bacon","vie","40%","Las Condes","R"],["Cakao Chocolateria","lun","40%","Vitacura / Providencia","G"],["Caramel","mar","40%","Las Condes","G"],["Barquilleria","lun","40%","Presencial","G"],["Le Vice","vie","40%","Vitacura","G"],["Naoki","mar","40%","Vitacura","R"],["Chiuso Ristorante","jue","40%","Vitacura","R"],["Amares","jue","40%","Antofagasta","R"],["Alma Restaurant","jue","40%","Talca","R"],["Terra Acai","mie","40%","Las Condes","R"],["Domingo's","jue,dom","40%","Las Condes","R"],["Las Genovesas","lun","40%","Presencial","G"],["Coccolino Pasteleria","jue","40%","Vina del Mar / Concon","G"],["Amar Chicureo","lun","40%","Chicureo","R"],["Tololo","mie","40%","La Serena","R"],["La Place Pasteleria","sab","40%","Presencial","G"],["Dulceria Praline","mie","40%","Presencial","G"],["DAI! Heladeria","mie","40%","Presencial","G"],["Heladeria El Taller","jue","40%","Presencial/Online","G"],["POGA Heladeria","vie","40%","Presencial","G"],["Ciao Amore","sab","40%","Presencial","G"],["Dilusso Gelato","dom","40%","Presencial","G"],["Local Burger","vie","40%","Las Condes/Nunoa/Prov.","R"],["Pescados Capitales","dom","50%","Vitacura","R"],["Bife Sureno","jue","40%","Los Angeles","R"],["T.P.M.","mar","40%","Las Condes/Providencia","R"],["Cuerovaca","sab","50%","Vitacura","R"],["Azotea Matilde","sab","40%","Providencia","R"]];
+
+function regLbl(r){if(r==='RM')return 'Metropolitana';if(r==='R')return 'Regiones';if(r==='RMR')return 'RM + Regiones';return 'Nacional';}
+function classify(bank,name,extra){
+  const n=name.toLowerCase();
+  if(bank==='sco'&&extra==='Vinas')return 'wine';
+  if(/vinopolis|el mundo del vino|liquidos|\bvino\b|vinolia|\bwine\b|\bvina \b/.test(n))return 'wine';
+  if(/rappi|pedidosya|pedidos ya|corrales del sur|juan esparraguito|aquality/.test(n))return 'other';
+  return 'food';
+}
+function discNum(d){const m=(d||'').match(/(\d+)/);return m?parseInt(m[1]):-1;}
+
+const MERGED=[];
+const RAT={"naoki":[4.6,1530,4],"brunapoli":[4.4,2675,2],"demencia":[4.1,1394,0],"hijo del sol":[4.6,319,0],"dulceria puerto varas":[4.5,13,0],"de pura madre":[4.3,601,0],"vicenzo cucina":[4.5,335,0],"al pesto":[4.7,4642,2],"sushi nikkei 17":[4.6,373,0],"la maestranza":[4.5,3105,3],"lumiere bistro":[4.6,1623,0],"don teo":[4.7,347,0],"majestic":[4.5,1410,3],"madonna":[4.4,1285,3],"jardin mallinkrodt":[4.5,5102,2],"dominga bistro":[4.1,510,0],"casa vitalis":[4.6,239,0],"kiara":[4.3,398,3],"oh bok":[4.7,740,0],"zulu":[4.4,615,0],"club somos":[4.4,63,0],"la yunta":[4.7,125,0],"quercus":[4.4,426,0],"maillard":[4.7,572,0],"tropicalia":[3.9,272,0],"pf chang's":[3.9,2436,2],"mit burger - casacostanera":[4.6,311,0],"do sushi":[4.4,1333,0],"kato":[4.8,963,0],"la parrilla del guaton jerez":[4.4,942,2],"catae restaurante":[4,164,0],"shinsei nikkei cuisine":[3.9,55,0],"kechua - borde rio":[4.7,591,0],"cuerovaca":[4.4,1421,4],"pescados capitales":[4.6,2558,4],"zia cafe bistro":[4.6,148,0],"pristino":[4.6,170,0],"nikkei 419":[4.2,537,0],"majka":[4.5,390,0],"restaurante hotel awa":[4.7,472,0],"local burger":[4.4,588,0],"vapiano":[4.5,10157,2],"ecook":[4.3,7,0],"le vice chocolat":[4.7,508,0],"chicken love you":[4.4,1068,2],"vertigo":[4.3,75,0],"fork":[4,148,2],"burger king":[4,2482,1],"streat burger":[4.9,69,0],"bozzo":[4.3,98,0],"domino":[4.2,496,2],"melt pizzas":[4.4,1152,2],"curacaribs":[4,68,0],"cascade bistro":[4.4,547,0],"el mundo del vino":[4.4,145,0],"rocoto":[4,765,2],"madre pizza":[4.7,33,0],"kento sushi":[2.9,105,0],"bar porfirio":[4.5,942,2],"social bar":[4.5,1325,2],"cosecha del mar":[4.1,42,0],"99 restaurante":[4.5,572,3],"la burguesia":[4.6,6151,2],"curry":[4,329,0],"expendio montt":[4,601,2],"cosenza":[3.9,178,0],"vinolia":[4.6,710,0],"raidho":[4.5,67,0],"la dicha":[4.5,634,0],"corrales del sur":[4.8,207,0],"don carlos":[4.5,2490,3],"giulietta":[4.2,83,0],"kechua - nunoa":[4.5,1346,0],"umami bar nikkei":[4.2,76,0],"gusto restobar":[4.1,185,0],"kanpai":[4.5,228,0],"san marco":[4.4,1092,0],"la hacienda":[4.6,342,0],"novu - curico":[4,288,2],"boreal bar":[4.5,541,0],"el galpon":[4.6,816,3],"las tranqueras":[4.5,579,3],"le grenier":[4.7,64,0],"regal pacific":[4.4,1882,0],"basa bar":[4.4,2912,4],"gran bar danzon":[4.5,4450,3],"vik wine":[4.4,268,0],"santa rita":[4.6,1058,0],"vina undurraga":[4.8,5002,0],"viu manent":[4.6,674,0],"vina terra noble":[4.6,79,0],"calyptra":[4.6,12,0],"novu - santa cruz":[3.5,78,0],"romaria pizzeria":[4.5,1133,2],"la santoria":[4.6,1254,0],"living cafe":[4.4,826,2],"the elephant coffee":[4.5,1210,0],"batard":[4.2,27,0],"cafe lo matta":[4.4,625,0],"caoba bar":[4.6,847,0],"barbazul":[4.2,2481,2],"chiuso ristorante":[5,53,0],"amares":[4.7,1373,3],"alma restaurant":[4.3,12,0],"tololo":[4.2,3612,3],"coccolino pasteleria":[4.6,371,0],"bife sureno":[4.4,529,2],"hotel jose nogueira":[4.4,426,0],"la pasta de la nonna":[4.5,2281,2],"cambalache":[4.4,1370,3],"la isla cochoa":[4,697,0],"amar chicureo":[4.5,50,0],"tavelli":[3.3,13,2],"oakberry":[5,4,0],"sushi ryge":[4.1,864,2],"noah sushi":[4.2,509,2],"chicken factory":[3.7,122,2],"just burger":[3.8,553,2],"lo saldes":[4.4,2646,2],"kevin and bacon":[4.9,517,0],"terra acai":[4.9,58,0],"cakao chocolateria":[4.2,98,0],"caramel":[4.7,425,0],"domingo's":[4.7,38,0],"la dulceria apoquindo":[3.6,23,0],"dilusso gelato":[4.6,124,0],"ciao amore":[4.5,76,0],"azotea matilde":[4.4,1842,3],"liquidos":[4.4,646,0],"street wrap":[4.3,117,0],"castano":[4.1,214,2],"la punta":[4.3,575,2],"kobo":[4,408,0],"le vice":[4.7,508,0],"la place pasteleria":[5,16,0],"pasteleria tere young":[4.1,52,0],"am dulceria":[4.7,306,0],"dulces issa":[4.3,28,0],"barquilleria":[4,172,0],"dulceria praline":[4.7,208,0],"dai! heladeria":[4.6,306,0],"poga heladeria":[4.5,242,0],"t.p.m.":[4.3,406,0],"kechua - terrazas san cristobal":[4.8,142,0],"heladeria el taller":[4.3,3933,2],"el taller":[4.3,3933,2],"dulceria frutillar":[5,29,0],"punto mona":[4.5,690,0],"oh no lulu bar":[4.3,2808,2],"vina encierra":[4.8,89,0],"sakura":[4.1,454,2]};
+function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s*-\s*justo$/,"").replace(/\s*\(.*\)$/,"").trim();}
+function kfmt(n){return n>=1000?(n/1000).toFixed(n>=10000?0:1)+"k":""+n;}
+const WEB={};
+function siteUrl(it){
+  const w=WEB[norm(it.n)];
+  if(w) return w;
+  const base=it.n.replace(/\s*-\s*justo$/i,'').replace(/\s*\(.*\)$/,'');
+  const place=(it.loc&&!/online|presencial|tienda|metropolitana|regiones|nacional/i.test(it.loc))?it.loc.split('/')[0].trim():'Chile';
+  return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(base+' '+place);
+}
+function noteFor(it){
+  if(it.bank==='san'){
+    let s='40% off, cap CLP $40.000/day. Valid Jun\u2013Aug 2026 paying with Santander WorldMember Limited, cr\u00e9dito or LATAM Pass.';
+    if(it.mds) s+=' Applies Wednesdays (Mi\u00e9rcoles de Sabores).';
+    s+=' Not combinable with other promotions.';
+    return s;
+  }
+  if(it.bank==='sco'){
+    const ruta={Local:'Ruta Gourmet',Internacional:'Ruta Internacional',Vinas:'Rutas de Vi\u00f1as',Dulce:'Ruta Dulce',Rapida:'Ruta R\u00e1pida'}[it.sub]||'Scotia Rewards';
+    let s='Scotiabank '+ruta+(it.disc?' ('+it.disc+')':'')+' with the Singular Visa Infinite.';
+    if(it.sub==='Local') s+=' Usually 50% Thu / 20% other days at participating venues.';
+    s+=' Enrollment and a monthly cap may apply \u2014 confirm in the Scotia Rewards app.';
+    return s;
+  }
+  if(it.bank==='bice'){
+    let s='Banco Bice '+(it.disc||'')+' with the Visa Infinite.';
+    if(/justo/i.test(it.n)) s+=' Order through the Justo app.';
+    else if(/rappi|pedidosya/i.test(it.n)) s+=' Order through the delivery app.';
+    s+=' A monthly cap may apply \u2014 confirm exact terms in the Bice app.';
+    return s;
+  }
+  return '';
+}
+SAN.forEach(r=>MERGED.push({n:r[0],days:r[1].split(','),disc:'40%',discN:40,loc:regLbl(r[2]),bank:'san',cat:classify('san',r[0]),mds:r[3].includes('M'),wml:r[3].includes('W')}));
+SCO.forEach(r=>MERGED.push({n:r[0],days:[r[1]],disc:r[2]?r[2]+'%':'',discN:discNum(r[2]),loc:r[3],bank:'sco',cat:classify('sco',r[0],r[4]),sub:r[4]}));
+BICE.forEach(r=>MERGED.push({n:r[0],days:r[1].split(','),disc:r[2],discN:discNum(r[2]),loc:r[3],bank:'bice',cat:classify('bice',r[0],r[4])}));
+
+let selected=todayKey(), catSel="all", bankSel="all", q="", sortMode="disc";
+function todayKey(){try{const wd=new Intl.DateTimeFormat('en-US',{weekday:'short',timeZone:'America/Santiago'}).format(new Date());return {Mon:"lun",Tue:"mar",Wed:"mie",Thu:"jue",Fri:"vie",Sat:"sab",Sun:"dom"}[wd]||"lun";}catch(e){return "lun";}}
+function el(id){return document.getElementById(id);}
+function match(it){return (bankSel==='all'||it.bank===bankSel)&&(catSel==='all'||it.cat===catSel)&&(!q||it.n.toLowerCase().indexOf(q.toLowerCase())>-1);}
+function forDay(dk){return MERGED.filter(it=>(it.days.indexOf(dk)>-1||it.days.indexOf('diario')>-1)&&match(it));}
+function daily(){return MERGED.filter(it=>it.days.indexOf('diario')>-1&&match(it));}
+function bySort(a,b){
+  if(sortMode==='rate'){const ra=(RAT[norm(a.n)]||[0])[0],rb=(RAT[norm(b.n)]||[0])[0];return (rb-ra)||(b.discN-a.discN)||a.n.localeCompare(b.n);}
+  return (b.discN-a.discN)||(a.bank<b.bank?-1:1)||a.n.localeCompare(b.n);
+}
+
+function card(it){
+  const isDaily=it.days.indexOf('diario')>-1;
+  const everyTag=(isDaily&&selected!=='diario')?'<span class="tag e">EVERY DAY</span>':'';
+  const badges=[everyTag,it.wml?'<span class="tag w">WML</span>':'',it.mds?'<span class="tag m">MdS</span>':''].filter(Boolean).join('');
+  const disc=(it.disc&&it.discN>=0)?'<div class="disc">'+it.disc+'</div>':'<div class="disc small">benefit</div>';
+  const r=RAT[norm(it.n)];
+  const rate=r?'<span class="rate">\u2605 '+r[0]+' <em>('+kfmt(r[1])+')</em></span>':'';
+  const price=(r&&r[2])?'<span class="price">'+'$'.repeat(r[2])+'</span>':'';
+  const link=siteUrl(it);
+  const off=WEB[norm(it.n)];
+  const site=link?'<a class="site" href="'+link+'" target="_blank" rel="noopener">'+(off?'Website':'Map')+' \u2197</a>':'';
+  const meta=[it.loc?'<span>'+it.loc+'</span>':'',rate,price,site].filter(Boolean).join('<span class="sep">&middot;</span>');
+  const note=noteFor(it);
+  const notes=note?'<div class="note">'+note+'</div>':'';
+  return '<div class="m '+it.bank+'"><div class="minfo"><div class="mn"><span class="dot '+it.bank+'"></span>'+it.n+'</div>'+(meta?'<div class="ml">'+meta+'</div>':'')+(badges?'<div class="fl">'+badges+'</div>':'')+notes+'</div>'+disc+'</div>';
+}
+function catBlocks(list){
+  const cats=(catSel==='all')?CATS:CATS.filter(c=>c.k===catSel);
+  let html='';
+  for(const c of cats){
+    const items=list.filter(it=>it.cat===c.k).sort(bySort);
+    if(!items.length){ if(catSel!=='all') html+='<div class="empty">No '+c.l.toLowerCase()+' options for this filter.</div>'; continue; }
+    html+='<div class="catlbl">'+c.l+' <span class="n">&middot; '+items.length+'</span></div>';
+    html+='<div class="grid">'+items.map(card).join('')+'</div>';
+  }
+  return html||'<div class="empty">No options for this filter. Try "All" or clear the search.</div>';
+}
+function renderLegend(){
+  el('legend').innerHTML=Object.entries(BANKMETA).map(([k,m])=>'<div class="lg"><span class="dot '+k+'"></span><b>'+m.name+'</b> <span class="cc">'+m.card+'</span></div>').join('');
+}
+function renderCatSeg(){
+  const opts=[["all","All"]].concat(CATS.map(c=>[c.k,c.l]));
+  el('catseg').innerHTML=opts.map(([k,l])=>'<button data-k="'+k+'" class="'+(catSel===k?'on':'')+'">'+l+'</button>').join('');
+  el('catseg').querySelectorAll('button').forEach(n=>n.onclick=()=>{catSel=n.dataset.k;render();});
+}
+function renderBankSeg(){
+  const opts=[["all","All"],["san","San"],["sco","Sco"],["bice","Bice"]];
+  el('bankseg').innerHTML=opts.map(([k,l])=>'<button data-k="'+k+'" class="'+(bankSel===k?'on':'')+'">'+(k!=='all'?'<span class="d dot '+k+'"></span>':'')+l+'</button>').join('');
+  el('bankseg').querySelectorAll('button').forEach(n=>n.onclick=()=>{bankSel=n.dataset.k;render();});
+}
+function renderSortSeg(){
+  const opts=[["disc","Sort: Discount"],["rate","Sort: Rating"]];
+  el('sortseg').innerHTML=opts.map(([k,l])=>'<button data-k="'+k+'" class="'+(sortMode===k?'on':'')+'">'+l+'</button>').join('');
+  el('sortseg').querySelectorAll('button').forEach(n=>n.onclick=()=>{sortMode=n.dataset.k;render();});
+}
+const SLOTS=[{k:'diario',l:'EVERY DAY',f:'Every day',every:true}].concat(DAYS.map(d=>({k:d.k,l:d.l,f:d.f})));
+function listFor(k){return k==='diario'?daily():forDay(k);}
+function renderRibbon(){
+  const t=todayKey();
+  el('ribbon').innerHTML=SLOTS.map(s=>{const n=listFor(s.k).length;return '<div class="day '+(s.every?'everyday ':'')+(s.k===selected?'sel ':'')+(s.k===t?'today':'')+'" data-k="'+s.k+'"><div class="dl">'+s.l+'</div><div class="cnt">'+n+'</div></div>';}).join('');
+  el('ribbon').querySelectorAll('.day').forEach(n=>n.onclick=()=>{selected=n.dataset.k;render();});
+}
+function render(){
+  renderLegend();renderCatSeg();renderBankSeg();renderSortSeg();renderRibbon();
+  el('stamp').textContent='Updated '+UPDATED;
+  const cur=SLOTS.find(s=>s.k===selected)||SLOTS[0],list=listFor(selected);
+  el('dayTitle').innerHTML=cur.f+' <span>&middot; '+list.length+' options</span>';
+  el('hoyTag').textContent=(selected===todayKey())?'\u00b7 today':'';
+  el('dayBody').innerHTML=catBlocks(list);
+  el('foot').innerHTML='Live data (July 2026) from each bank\u2019s official feed: Santander promociones.json, Scotiabank scotiarewards.cl, Bice beneficios-bice. Each weekday now also lists always-on \u201CEVERY DAY\u201D benefits (tagged). \u2605 rating / $ price from Google Places (address-verified). The \u201CFind \u2197\u201D link opens the venue\u2019s Google listing \u2014 which carries its official website, menu, hours and directions; direct official-site links are being layered in. Notes show the program-level terms that apply: Santander 40% capped at CLP $40.000/day (Jun\u2013Aug 2026); Scotia per-Ruta terms; Bice Visa Infinite \u2014 confirm exact caps and enrollment in each bank\u2019s app. \u201COther\u201D = delivery apps, grocery and water.';
+}
+el('q').oninput=e=>{q=e.target.value;render();};
+render();
+</script>
