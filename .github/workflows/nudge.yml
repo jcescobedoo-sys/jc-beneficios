@@ -1,0 +1,24 @@
+name: Monthly refresh nudge
+
+   on:
+     schedule:
+       - cron: '0 4 2 * *'
+     workflow_dispatch:
+
+   permissions:
+     issues: write
+
+   jobs:
+     nudge:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/github-script@v7
+           with:
+             script: |
+               const month = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
+               await github.rest.issues.create({
+                 owner: context.repo.owner,
+                 repo: context.repo.repo,
+                 title: `Refresh benefits dashboard — ${month}`,
+                 body: `Time to refresh the card-benefits data for ${month}. Ask Claude to pull the three bank feeds and update data/san.json, data/sco.json, data/bice.json, then commit — the site redeploys itself.`
+               });
